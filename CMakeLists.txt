@@ -13,6 +13,8 @@ add_executable(${PROJECT_NAME}
     src/gui/MainWindow.cpp
     src/gui/MainWindow.h
     src/gui/MainWindow.ui
+    src/gui/tree_graphics_view/TreeGraphicsView.cpp
+    src/gui/tree_graphics_view/TreeGraphicsView.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
