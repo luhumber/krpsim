@@ -6,22 +6,24 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Concurrent)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Concurrent Charts)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/gui/MainWindow.cpp
-    src/gui/MainWindow.h
     src/gui/MainWindow.ui
     src/gui/tree_graphics_view/TreeGraphicsView.cpp
-    src/gui/tree_graphics_view/TreeGraphicsView.h
+    src/gui/line_chart_widget/LineChartWidget.cpp
+    src/gui/bar_chart_widget/BarChartWidget.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     src
     src/gui
+    src/gui/tree_graphics_view
+    src/gui/line_chart_widget
+    src/gui/bar_chart_widget
     src/core
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Concurrent)
-
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Concurrent Qt6::Charts)

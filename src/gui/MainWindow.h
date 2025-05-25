@@ -5,9 +5,8 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
-#include <QGraphicsEllipseItem>
 
-
+#include "TreeGraphicsView.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
