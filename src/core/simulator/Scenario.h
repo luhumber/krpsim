@@ -1,10 +1,12 @@
 #pragma once
+#include <QStringList>
+#include <QVector>
 #include "Process.h"
-#include <vector>
+#include "Stock.h"
 
 struct Scenario {
-    std::vector<std::string> resources;
-    Stock   initialStock   {};
-    std::vector<Process> processes;
-    uint8_t optimizeResId = 0;
+    QStringList         resources;
+    Stock               initialStock; 
+    QVector<Process>    processes;
+    QStringList         optimizeTargets;
 };

@@ -15,12 +15,17 @@ add_executable(${PROJECT_NAME}
     src/gui/MainWindow.ui
     src/gui/tree_graphics_view/TreeGraphicsView.cpp
     src/gui/tree_graphics_view/TreeGraphicsView.h
+    src/core/parser/Parser.cpp
+    src/core/parser/regex/RegexDefs.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     src
     src/gui
     src/core
+    src/core/parser
+    src/core/parser/regex
+    src/core/simulator
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Concurrent)

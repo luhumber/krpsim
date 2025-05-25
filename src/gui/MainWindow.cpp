@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "Parser.h"
+#include "Scenario.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,7 +21,16 @@ MainWindow::MainWindow(QWidget *parent)
     QGraphicsEllipseItem *node2 = scene->addEllipse(100, 100, 40, 40, QPen(Qt::black), QBrush(Qt::yellow));
     node1->setZValue(1);
     node2->setZValue(1);
-    
+
+    QString filePath = QDir::current().filePath("../resources/pomme");
+    Parser parser;
+    try {
+        Scenario scenario = parser.parseFile(std::filesystem::path(filePath.toStdString()));
+        qDebug() << "Parsed scenario with resources:" << scenario.resources;
+    } catch (const std::exception &e) {
+        qDebug() << "Error parsing file:" << e.what();
+    }
+
     connect(ui->filesPushButton, &QPushButton::clicked, this, &MainWindow::on_filesPushButtonClicked);
 }
 
