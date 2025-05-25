@@ -111,7 +111,7 @@
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -158,6 +158,11 @@
        <attribute name="title">
         <string>Beam</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="BeamTableView" name="beamTableView"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -192,6 +197,11 @@
    <extends>QWidget</extends>
    <header>BarChartWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BeamTableView</class>
+   <extends>QTableView</extends>
+   <header>BeamTableView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

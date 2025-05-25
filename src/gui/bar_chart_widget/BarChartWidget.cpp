@@ -32,11 +32,13 @@ BarChartWidget::BarChartWidget(QWidget *parent)
     QBarCategoryAxis *axisX = new QBarCategoryAxis();
     axisX->append(categories);
     axisX->setLabelsColor(Qt::white);
-    chart->setAxisX(axisX, series);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis();
     axisY->setLabelsColor(Qt::white);
-    chart->setAxisY(axisY, series);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
@@ -50,4 +52,6 @@ BarChartWidget::BarChartWidget(QWidget *parent)
     pal.setColor(QPalette::Window, QColor("#232629"));
     setAutoFillBackground(true);
     setPalette(pal);
+
+    chart->legend()->setVisible(false);
 }

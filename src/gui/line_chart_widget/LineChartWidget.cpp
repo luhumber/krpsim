@@ -28,6 +28,9 @@ LineChartWidget::LineChartWidget(QWidget *parent)
     chartView->setRenderHint(QPainter::Antialiasing);
     chartView->setBackgroundBrush(QBrush(QColor("#232629")));
 
+    chartView->setRubberBand(QChartView::RectangleRubberBand);
+    chartView->setDragMode(QGraphicsView::ScrollHandDrag);
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(chartView);
     setLayout(layout);
@@ -36,4 +39,9 @@ LineChartWidget::LineChartWidget(QWidget *parent)
     pal.setColor(QPalette::Window, QColor("#232629"));
     setAutoFillBackground(true);
     setPalette(pal);
+
+    chart->legend()->setVisible(false);
+
+    // Pour autoscale après zoom/déplacement, tu peux ajouter un bouton ou un slot qui appelle :
+    // chart->zoomReset();
 }
