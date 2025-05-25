@@ -9,6 +9,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QString filePath = QDir::current().filePath("../resources/pomme");
+    Parser parser;
+    try {
+        Scenario scenario = parser.parseFile(std::filesystem::path(filePath.toStdString()));
+        qDebug() << "Parsed scenario with resources:" << scenario.resources;
+    } catch (const std::exception &e) {
+        qDebug() << "Error parsing file:" << e.what();
+    }
+
     connect(ui->filesPushButton, &QPushButton::clicked, this, &MainWindow::on_filesPushButtonClicked);
 }
 
