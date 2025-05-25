@@ -111,7 +111,7 @@
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -119,7 +119,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QGraphicsView" name="treeGraphicsView"/>
+         <widget class="TreeGraphicsView" name="treeGraphicsView"/>
         </item>
        </layout>
       </widget>
@@ -127,11 +127,42 @@
        <attribute name="title">
         <string>Progress</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="LineChartWidget" name="lineChartWidget" native="true"/>
+          </item>
+          <item>
+           <widget class="BarChartWidget" name="barChartWidget" native="true">
+            <property name="maximumSize">
+             <size>
+              <width>500</width>
+              <height>16777215</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="value">
+           <number>24</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Beam</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="BeamTableView" name="beamTableView"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -149,6 +180,30 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TreeGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>TreeGraphicsView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LineChartWidget</class>
+   <extends>QWidget</extends>
+   <header>LineChartWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BarChartWidget</class>
+   <extends>QWidget</extends>
+   <header>BarChartWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BeamTableView</class>
+   <extends>QTableView</extends>
+   <header>BeamTableView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

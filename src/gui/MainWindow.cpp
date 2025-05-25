@@ -9,19 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    ui->treeGraphicsView->setScene(scene);
-
-    QPointF center1(20, 20);
-    QPointF center2(120, 120);
-    QGraphicsLineItem *line = scene->addLine(QLineF(center1, center2), QPen(Qt::black, 2));
-    line->setZValue(0);
-
-    QGraphicsEllipseItem *node1 = scene->addEllipse(0, 0, 40, 40, QPen(Qt::black), QBrush(Qt::yellow));
-    QGraphicsEllipseItem *node2 = scene->addEllipse(100, 100, 40, 40, QPen(Qt::black), QBrush(Qt::yellow));
-    node1->setZValue(1);
-    node2->setZValue(1);
-
     QString filePath = QDir::current().filePath("../resources/pomme");
     Parser parser;
     try {
