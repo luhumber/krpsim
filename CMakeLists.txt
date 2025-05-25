@@ -16,6 +16,8 @@ add_executable(${PROJECT_NAME}
     src/gui/line_chart_widget/LineChartWidget.cpp
     src/gui/bar_chart_widget/BarChartWidget.cpp
     src/gui/beam_table_view/BeamTableView.cpp
+    src/core/parser/Parser.cpp
+    src/core/parser/regex/RegexDefs.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -26,6 +28,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/gui/bar_chart_widget
     src/gui/beam_table_view
     src/core
+    src/core/parser
+    src/core/parser/regex
+    src/core/simulator
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Concurrent Qt6::Charts)

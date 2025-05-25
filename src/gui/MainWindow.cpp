@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "Parser.h"
+#include "Scenario.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

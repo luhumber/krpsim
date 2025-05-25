@@ -1,9 +1,9 @@
 #pragma once
-#include "Stock.hpp"
-#include <string_view>
+#include "Stock.h"
+#include <QString>
 
 struct Process {
-    std::string_view name;
+    QString name;
     Stock   needs   {};
     Stock   results {};
     uint16_t delay = 0;
