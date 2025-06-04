@@ -7,6 +7,7 @@
 #include <QMessageBox>
 
 #include "TreeGraphicsView.h"
+#include "BeamSearch.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,5 +24,9 @@ private:
     Ui::MainWindow*         ui;
 
 private slots:
-    void on_filesPushButtonClicked();
+    void on_FilesPushButtonClicked();
+    void on_StartPushButtonClicked();
+
+signals:
+    void signal_NodesVectorCreated(const QVector<BeamNode>& nodes, const QVector<BeamNode> &current_beam);
 };
