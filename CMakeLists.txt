@@ -18,6 +18,9 @@ add_executable(${PROJECT_NAME}
     src/gui/beam_table_view/BeamTableView.cpp
     src/core/parser/Parser.cpp
     src/core/parser/regex/RegexDefs.cpp
+    src/core/beam_search/BeamSearch.cpp
+    src/core/beam_search/beam_node/BeamNode.cpp
+    src/core/simulator/Stock.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -31,6 +34,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/core/parser
     src/core/parser/regex
     src/core/simulator
+    src/core/beam_search
+    src/core/beam_search/beam_node
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Concurrent Qt6::Charts)

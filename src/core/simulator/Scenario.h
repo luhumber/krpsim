@@ -6,7 +6,7 @@
 
 struct Scenario {
     QStringList         resources;
-    Stock               initialStock; 
+    Stock               initial_stock; 
     QVector<Process>    processes;
-    QStringList         optimizeTargets;
+    QStringList         optimize_targets;
 };

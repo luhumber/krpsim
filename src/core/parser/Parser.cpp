@@ -1,30 +1,57 @@
 #include "Parser.h"
 #include "Scenario.h"
-
 #include <QFile>
 #include <QTextStream>
 #include <QDebug>
-#include <QRegularExpressionMatch>
 #include "RegexDefs.h"
 
 namespace {
-    void parseResourceQuantities(const QString& groupString, Stock& resourceQuantities, QStringList& allResources) {
-        const QStringList items = groupString.split(';', Qt::SkipEmptyParts);
-        for (const QString& item : items) {
+    void ParseResourceQuantities(const QString& groupString, Stock& resourceQuantities, QSet<QString>& allResources) {
+        for (const QString& item : groupString.split(';', Qt::SkipEmptyParts)) {
             const QStringList parts = item.split(':', Qt::SkipEmptyParts);
-            if (parts.size() != 2)
-                continue;
+            if (parts.size() != 2) continue;
             const QString resourceName = parts[0].trimmed();
             const int quantity = parts[1].toInt();
             resourceQuantities[resourceName] = quantity;
-            if (!allResources.contains(resourceName))
-                allResources.append(resourceName);
+            allResources.insert(resourceName);
         }
+    }
+
+    bool HandleStockLine(const QString& line, Scenario& scenario, QSet<QString>& resources) {
+        QRegularExpressionMatch match = Regex::stockLineRegex.match(line);
+        if (!match.hasMatch()) return false;
+        const QString resourceName = match.captured(1);
+        const int quantity = match.captured(2).toInt();
+        resources.insert(resourceName);
+        scenario.initial_stock[resourceName] = quantity;
+        return true;
+    }
+
+    bool HandleProcessLine(const QString& line, Scenario& scenario, QSet<QString>& resources) {
+        QRegularExpressionMatch match = Regex::processLineRegex.match(line);
+        if (!match.hasMatch()) return false;
+        Process process;
+        process.name = match.captured(1);
+        ParseResourceQuantities(match.captured(2), process.needs, resources);
+        if (!match.captured(3).isEmpty())
+            ParseResourceQuantities(match.captured(3), process.results, resources);
+        process.delay = match.captured(4).toUInt();
+        scenario.processes.append(process);
+        return true;
+    }
+
+    bool HandleOptimizeLine(const QString& line, Scenario& scenario) {
+        QRegularExpressionMatch match = Regex::optimizeLineRegex.match(line);
+        if (!match.hasMatch()) return false;
+        for (const QString& target : match.captured(1).split(';', Qt::SkipEmptyParts))
+            scenario.optimize_targets.append(target);
+        return true;
     }
 }
 
-Scenario Parser::parseFile(const std::filesystem::path& path) {
+Scenario Parser::ParseFile(const std::filesystem::path& path) {
     Scenario scenario;
+    QSet<QString> resources;
     QFile file(QString::fromStdString(path.string()));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         throw std::runtime_error("Could not open file: " + path.string());
@@ -32,70 +59,12 @@ Scenario Parser::parseFile(const std::filesystem::path& path) {
     QTextStream inputStream(&file);
     while (!inputStream.atEnd()) {
         QString line = inputStream.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
-            continue;
-        
-        qDebug() << "=====================================";
-
-        if (Parser::handleStockLine   (line, scenario))   continue;
-        if (Parser::handleProcessLine (line, scenario))   continue;
-        if (Parser::handleOptimizeLine(line, scenario))   continue;
-
+        if (line.isEmpty() || line.startsWith('#')) continue;
+        if (HandleStockLine(line, scenario, resources)) continue;
+        if (HandleProcessLine(line, scenario, resources)) continue;
+        if (HandleOptimizeLine(line, scenario)) continue;
         qDebug() << "Line skipped (invalid format):" << line;
     }
-
+    scenario.resources = resources.values();
     return scenario;
-}
-
-bool Parser::handleOptimizeLine(const QString& line, Scenario& scenario) {
-    QRegularExpressionMatch match = Regex::optimizeLineRegex.match(line);
-    if (!match.hasMatch()) return false;
-
-    for (const QString& target : match.captured(1).split(';', Qt::SkipEmptyParts)) {
-        scenario.optimizeTargets.append(target);
-        qDebug() << "Optimize target:" << target;
-    }
-    return true;
-}
-
-bool Parser::handleStockLine(const QString& line, Scenario& scenario) {
-    QRegularExpressionMatch match = Regex::stockLineRegex.match(line);
-    if (!match.hasMatch()) return false;
-
-    const QString resourceName = match.captured(1);
-    const int quantity = match.captured(2).toInt();
-    scenario.resources.append(resourceName);
-    scenario.initialStock[resourceName] = quantity;
-    qDebug() << "Initial stock parsed:" << resourceName << ":" << quantity;
-    return true;
-}
-
-bool Parser::handleProcessLine(const QString& line, Scenario& scenario) {
-    QRegularExpressionMatch match = Regex::processLineRegex.match(line);
-    if (!match.hasMatch()) return false;
-    qDebug() << "Processing line for process:" << line;
-
-    Process process;
-    process.name = match.captured(1);
-
-    parseResourceQuantities(match.captured(2), process.needs, scenario.resources);
-    if (!match.captured(3).isEmpty())
-        parseResourceQuantities(match.captured(3), process.results, scenario.resources);
-
-    qDebug() << "Process parsed:" << process.name;
-    qDebug() << "Needs:";
-    for (const auto& need : process.needs.toStdMap()) {
-        qDebug() << "  " << need.first << ":" << need.second;
-    }
-    qDebug() << "Results:";
-    for (const auto& result : process.results.toStdMap()) {
-        qDebug() << "  " << result.first << ":" << result.second;
-    }
-
-    process.delay = match.captured(4).toUInt();
-    qDebug() << "Delay parsed for process:" << process.name << ":" << process.delay;
-
-    scenario.processes.append(process);
-    qDebug() << "Process appended:" << process.name;
-    return true;
 }
