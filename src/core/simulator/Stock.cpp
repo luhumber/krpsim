@@ -44,3 +44,13 @@ QString Stock::toString() const {
 const QMap<QString, int32_t>& Stock::data() const {
     return _data;
 }
+
+QString Stock::toStringSorted() const {
+        QStringList parts;
+        auto sortedKeys = _data.keys();
+        std::sort(sortedKeys.begin(), sortedKeys.end());
+        for (const QString& key : sortedKeys) {
+            parts << QString("%1:%2").arg(key).arg(_data[key]);
+        }
+        return parts.join(";");
+    }

@@ -27,5 +27,6 @@ private:
     int _beam_size;
     QVector<BeamNode> _current_beam;
     QVector<BeamNode> _nodes_vector;
-    double _time_weight = 0.5;
+    double _time_penalty = 0.5;
+    QHash<QString, int> _seenStockBestTime;
 };
