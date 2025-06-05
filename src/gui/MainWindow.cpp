@@ -61,7 +61,7 @@ void MainWindow::on_StartPushButtonClicked() {
         //              << "| Results:" << process.results.toString()
         //              << "| Delay:" << process.delay;
         // }
-        BeamSearch beam_search(scenario, 2);
+        BeamSearch beam_search(scenario, 10);
         beam_search.RunAlgorithm();
         emit signal_NodesVectorCreated(beam_search.getNodesVector(), beam_search.getSolutionPath());
     } catch (const std::exception &e) {

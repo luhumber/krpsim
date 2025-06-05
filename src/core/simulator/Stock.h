@@ -20,6 +20,8 @@ public:
 
     const QMap<QString, int32_t>& data() const;
 
+    QString toStringSorted() const;
+
 private:
     QMap<QString, int32_t> _data;
 };
