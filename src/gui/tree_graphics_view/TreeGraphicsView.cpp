@@ -8,108 +8,109 @@
 #include <QQueue>
 
 TreeGraphicsView::TreeGraphicsView(QWidget *parent)
-    : QGraphicsView(parent),
-      _scene(new QGraphicsScene(this)),
-      _currentX(0.0)
+    : QGraphicsView(parent), _scene(new QGraphicsScene(this)), _current_x(0.0)
 {
     setScene(_scene);
     setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
-void TreeGraphicsView::clearData()
+void TreeGraphicsView::ClearData()
 {
     _layouts.clear();
-    _childrenMap.clear();
-    _nodeItems.clear();
-    _currentX = 0.0;
+    _children_map.clear();
+    _node_items.clear();
+    _current_x = 0.0;
 }
 
 void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
                                               const QVector<BeamNode> &current_beam)
 {
-    qDebug() << "Received Current Beam with" << current_beam.size() << "nodes.";
-    // 1. Nettoyer la scène et les données précédentes
     _scene->clear();
-    clearData();
+    this->ClearData();
 
-    // 2. Construire le map id -> BeamNode et parent -> liste d'enfants
     for (const BeamNode &bn : nodes) {
-        int id       = bn.getId();
+        int id = bn.getId();
         int parentId = bn.getParentId();
-        _layouts[id] = { bn, -1, QPointF() };  // depth à calculer
-        // Inscrire cet id comme enfant de parentId (même si parentId == -1)
-        _childrenMap[parentId].append(id);
+        _layouts[id] = { bn, -1, QPointF() };
+        _children_map[parentId].append(id);
     }
 
-    // 3. Calculer la profondeur (depth) de chaque nœud
-    computeDepths();
+    this->ComputeDepths();
+    this->AssignPositions();
 
-    // 4. Calculer les positions (x, y) via un parcours récursif
-    assignPositions();
+    QPen node_pen(QColor("#CCCCCC"));
+    QBrush normal_brush(QColor("#222222"));
+    QBrush solution_brush(QColor("#2ecc40"));
 
-    // 5. Créer les items graphiques (cercles) aux positions calculées
-    QPen   nodePen(Qt::black);
-    QBrush normalBrush(Qt::yellow);
-    QBrush solutionBrush(Qt::green);
-
-    QSet<int> beamIds;
+    QSet<int> beam_ids;
     for (const BeamNode &bn : current_beam) {
-        beamIds.insert(bn.getId());
+        beam_ids.insert(bn.getId());
     }
 
-    for (auto it = _layouts.constBegin(); it != _layouts.constEnd(); ++it) {
+    for (auto it = _layouts.cbegin(); it != _layouts.cend(); ++it) {
         int id = it.key();
         const NodeLayout &nl = it.value();
 
-        const QBrush &brush = beamIds.contains(id) ? solutionBrush : normalBrush;
+        const QBrush &brush = beam_ids.contains(id) ? solution_brush : normal_brush;
 
-        // Les coordonnées fournies dans nl.pos représentent le centre du nœud
-        double x = nl.pos.x() - _nodeRadius;
-        double y = nl.pos.y() - _nodeRadius;
+        QString display_text = nl.node.getProcessName();
+        QFont font;
+        font.setPointSize(10);
+        QFontMetrics fm(font);
+        int text_width = fm.horizontalAdvance(display_text);
+        int text_height = fm.height();
+
+        double radius = std::max(_nodeRadius, std::max(text_width, text_height) / 2.0 + 10.0);
+
+        double x = nl.pos.x() - radius;
+        double y = nl.pos.y() - radius;
 
         QGraphicsEllipseItem *ellipse = _scene->addEllipse(
             x, y,
-            _nodeRadius * 2.0, _nodeRadius * 2.0,
-            nodePen, brush
+            radius * 2.0, radius * 2.0,
+            node_pen, brush
         );
         ellipse->setZValue(1);
-        ellipse->setToolTip(QString("Node %1: %2, Score: %3").arg(id).arg(nl.node.getProcessName()).
-                            arg(nl.node.score()));
-        _nodeItems[id] = ellipse;
+        ellipse->setToolTip(QString("Node %1: %2").arg(id).arg(display_text));
+        _node_items[id] = ellipse;
+
+        QGraphicsTextItem *text = _scene->addText(display_text);
+        text->setFont(font);
+        text->setDefaultTextColor(QColor("#EEEEEE"));
+        QRectF ellipseRect = ellipse->rect();
+        text->setPos(
+            x + (radius * 2.0 - text->boundingRect().width()) / 2.0,
+            y + (radius * 2.0 - text->boundingRect().height()) / 2.0
+        );
+        text->setZValue(2);
     }
 
-    // 6. Tracer les arêtes (lignes) parent -> enfant
-    QPen edgePen(Qt::red, 2);
+    QPen edge_pen(QColor("#888888"), 2);
 
-    for (auto it = _layouts.constBegin(); it != _layouts.constEnd(); ++it) {
-        int id       = it.key();
+    for (auto it = _layouts.cbegin(); it != _layouts.cend(); ++it) {
+        int id = it.key();
         int parentId = it.value().node.getParentId();
-        if (parentId < 0 || !_nodeItems.contains(parentId))
+        if (parentId < 0 || !_node_items.contains(parentId))
             continue;
 
-        // Calculer le centre du parent
-        QGraphicsEllipseItem *parentItem = _nodeItems[parentId];
+        QGraphicsEllipseItem *parentItem = _node_items[parentId];
         QPointF parentCenter = parentItem->rect().center() + parentItem->pos();
 
-        // Calculer le centre de l'enfant
-        QGraphicsEllipseItem *childItem = _nodeItems[id];
+        QGraphicsEllipseItem *childItem = _node_items[id];
         QPointF childCenter = childItem->rect().center() + childItem->pos();
 
-        _scene->addLine(QLineF(parentCenter, childCenter), edgePen)->setZValue(0);
+        _scene->addLine(QLineF(parentCenter, childCenter), edge_pen)->setZValue(0);
     }
 
-    // 7. Ajuster le zoom pour faire tenir tout l'arbre
     fitInView(_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
-void TreeGraphicsView::computeDepths()
+void TreeGraphicsView::ComputeDepths()
 {
-    // Recherche en largeur (BFS) à partir des racines (parentId == -1)
     QQueue<int> queue;
 
-    // Initialiser depth = 0 pour tous les nœuds dont parentId == -1, et les enfile
-    for (auto it = _layouts.constBegin(); it != _layouts.constEnd(); ++it) {
-        int id       = it.key();
+    for (auto it = _layouts.cbegin(); it != _layouts.cend(); ++it) {
+        int id = it.key();
         int parentId = it.value().node.getParentId();
         if (parentId < 0) {
             _layouts[id].depth = 0;
@@ -117,65 +118,51 @@ void TreeGraphicsView::computeDepths()
         }
     }
 
-    // Pour chaque nœud sans parent enregistré, s'assurer qu'il existe dans _layouts
-    // (si parentId miraculeusement absent de _layouts, l'ignorer)
     while (!queue.isEmpty()) {
-        int currId = queue.dequeue();
-        int currDepth = _layouts[currId].depth;
+        int current_id = queue.dequeue();
+        int current_depth = _layouts[current_id].depth;
 
-        // Pour chacun des enfants directs
-        const QList<int> &children = _childrenMap.value(currId);
-        for (int childId : children) {
-            // On définit child.depth = currDepth + 1
-            _layouts[childId].depth = currDepth + 1;
-            queue.enqueue(childId);
+        const QList<int> &children = _children_map.value(current_id);
+        for (int child_id : children) {
+            _layouts[child_id].depth = current_depth + 1;
+            queue.enqueue(child_id);
         }
     }
 
-    // Note : si des nœuds n'ont pas été atteints (cycle ou données invalides), ils garderont depth = -1.
-    // On peut les forcer à depth = 0 pour éviter des problèmes ultérieurs.
     for (auto it = _layouts.begin(); it != _layouts.end(); ++it) {
         if (it.value().depth < 0)
             it.value().depth = 0;
     }
 }
 
-void TreeGraphicsView::assignPositions()
+void TreeGraphicsView::AssignPositions()
 {
-    // Démarrer la position courante en x à 0
-    _currentX = 0.0;
+    _current_x = 0.0;
 
-    // Appeler positionRec pour chaque racine (parentId == -1)
-    const QList<int> &roots = _childrenMap.value(-1);
+    const QList<int> &roots = _children_map.value(-1);
     for (int rootId : roots) {
-        positionRec(rootId);
+        this->PositionRec(rootId);
     }
 }
 
-void TreeGraphicsView::positionRec(int nodeId)
+void TreeGraphicsView::PositionRec(int nodeId)
 {
-    const QList<int> &children = _childrenMap.value(nodeId);
+    const QList<int> &children = _children_map.value(nodeId);
 
     if (children.isEmpty()) {
-        // Feuille : on la place à currentX
-        double x = _currentX;
+        double x = _current_x;
         double y = _layouts[nodeId].depth * _vSpacing;
         _layouts[nodeId].pos = QPointF(x, y);
-
-        // Incrémenter la position X pour la prochaine feuille
-        _currentX += _hSpacing;
+        _current_x += _hSpacing;
     }
     else {
-        // Nœud interne : d'abord positionner tous les enfants
-        for (int childId : children) {
-            positionRec(childId);
+        for (int child_id : children) {
+            this->PositionRec(child_id);
         }
 
-        // Récupérer x des enfants extrêmes
         double firstChildX = _layouts[children.first()].pos.x();
         double lastChildX  = _layouts[children.last()].pos.x();
 
-        // Positionner ce nœud au milieu de ses enfants
         double x = (firstChildX + lastChildX) / 2.0;
         double y = _layouts[nodeId].depth * _vSpacing;
         _layouts[nodeId].pos = QPointF(x, y);

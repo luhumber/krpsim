@@ -29,16 +29,16 @@ private:
     };
 
     QGraphicsScene             *_scene;
-    QHash<int, QGraphicsEllipseItem*> _nodeItems;    // id -> graphic item
-    QHash<int, NodeLayout>     _layouts;              // id -> layout info
-    QHash<int, QList<int>>     _childrenMap;          // parentId -> list of children ids
-    double                     _currentX;             // used during recursive layout
-    const double               _nodeRadius  = 20.0;   // rayon du cercle
-    const double               _hSpacing    = 80.0;   // espacement horizontal minimal entre feuilles
-    const double               _vSpacing    = 100.0;  // espacement vertical entre niveaux
+    QHash<int, QGraphicsEllipseItem*> _node_items;
+    QHash<int, NodeLayout>     _layouts;
+    QHash<int, QList<int>>     _children_map;
+    double                     _current_x;
+    const double               _nodeRadius  = 20.0;
+    const double               _hSpacing    = 80.0;
+    const double               _vSpacing    = 100.0;
 
-    void computeDepths();                               // calcule la profondeur de chaque nœud
-    void assignPositions();                             // calcule la position x,y de chaque nœud
-    void positionRec(int nodeId);                       // fonction récursive pour le layout
-    void clearData();                                   // vide les structures intermédiaires
+    void ComputeDepths();
+    void AssignPositions();
+    void PositionRec(int nodeId);
+    void ClearData();
 };

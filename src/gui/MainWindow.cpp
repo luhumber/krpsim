@@ -55,6 +55,12 @@ void MainWindow::on_StartPushButtonClicked() {
     try {
         Scenario scenario = Parser::ParseFile(std::filesystem::path(filePath.toStdString()));
         qDebug() << "Parsed scenario with resources:" << scenario.resources;
+        // for (const Process &process : scenario.processes) {
+        //     qDebug() << "Process:" << process.name
+        //              << "| Needs:" << process.needs.toString()
+        //              << "| Results:" << process.results.toString()
+        //              << "| Delay:" << process.delay;
+        // }
         BeamSearch beam_search(scenario, 2);
         beam_search.RunAlgorithm();
         emit signal_NodesVectorCreated(beam_search.getNodesVector(), beam_search.getSolutionPath());
