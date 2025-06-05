@@ -4,6 +4,7 @@
 #include <QHash>
 #include <QString>
 #include <QDebug>
+#include <QElapsedTimer>
 
 #include "Scenario.h"
 #include "BeamNode.h"
@@ -26,5 +27,5 @@ private:
     int _beam_size;
     QVector<BeamNode> _current_beam;
     QVector<BeamNode> _nodes_vector;
-    double _timeWeight = 0.5;
+    double _time_weight = 0.5;
 };
