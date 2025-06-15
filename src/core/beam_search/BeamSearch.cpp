@@ -3,10 +3,11 @@
 #include <QDebug>
 #include <QElapsedTimer> // Ajout pour la limite de temps
 
-BeamSearch::BeamSearch(const Scenario& scenario, int beam_size)
+BeamSearch::BeamSearch(const Scenario& scenario, int beam_size, double max_time)
     : _scenario(scenario)
     , _beam_size(beam_size)
-    , _time_penalty(1.0)   // Par défaut, pénalité de 1.0 par unité de temps
+    , _time_penalty(1.0)
+    , _max_time(max_time) // Ajout
 {
     // On initialise le faisceau avec un seul état “START” en dehors de RunAlgorithm()
     BeamState initial_state{scenario.initial_stock, 0, 0.0};
@@ -33,18 +34,8 @@ void BeamSearch::RunAlgorithm() {
 
     int next_id = 1;
 
-    // Ajout : timer pour la limite de temps
-    QElapsedTimer timer;
-    timer.start();
-    const qint64 TIME_LIMIT_MS = 30000; // 30 secondes
-
     // Tant que le faisceau courant n'est pas vide, on l'expanse
     while (!_current_beam.isEmpty()) {
-        // Vérifie la limite de temps
-        if (timer.elapsed() > TIME_LIMIT_MS) {
-            qDebug() << "Limite de temps atteinte (" << TIME_LIMIT_MS / 1000 << "s), arrêt de l'algorithme.";
-            break;
-        }
         this->ExpandBeam(_current_beam, next_id);
     }
 
@@ -112,37 +103,32 @@ void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id) {
     for (const BeamNode& node : current_beam) {
         const BeamState& state = node.getState();
 
-        // Pour chaque process atomique du Scenario
         for (const Process& process : _scenario.processes) {
-            // Si les intrants sont tous disponibles dans le stock
             if (state.stock.CanApplyProcess(process.needs)) {
-                // Création du nouvel état enfant
                 BeamState child_state = state;
                 child_state.stock.ApplyProcess(process.needs, process.results);
                 child_state.time += process.delay;
+
+                // --- AJOUT : on ignore si on dépasse la limite ---
+                if (child_state.time > _max_time) {
+                    continue;
+                }
+                // ------------------------------------------------
+
                 child_state.score = this->ComputeScore(child_state, _scenario);
 
-                // Clé canonique du stock pour la déduplication
-                // On suppose que Stock a une méthode toStringSorted() qui retourne
-                // un QString du style "blanc_oeuf:3;farine:100;oeuf:5;..." dans un ordre fixe.
                 QString stockKey = child_state.stock.toStringSorted();
-
-                // Vérifier si on a déjà vu ce stockKey à un time ≤ child_state.time
                 auto it = _seenStockBestTime.find(stockKey);
                 if (it == _seenStockBestTime.end()) {
-                    // Première fois qu'on voit cette configuration
                     _seenStockBestTime.insert(stockKey, child_state.time);
                 }
                 else if (child_state.time < it.value()) {
-                    // On a trouvé le même stock plus rapidement : on met à jour le time minimal
                     it.value() = child_state.time;
                 }
                 else {
-                    // On a déjà vu ce stock à un time ≤ child_state.time → on jette l'enfant
                     continue;
                 }
 
-                // Si on arrive ici, c'est qu'on garde cet enfant
                 BeamNode child_node(next_id++, node.getId(), child_state, process.name);
                 new_beam.append(child_node);
                 _nodes_vector.append(child_node);
@@ -155,18 +141,15 @@ void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id) {
         }
     }
 
-    // Tri descendant par score (les plus haut scores en tête)
     std::sort(new_beam.begin(), new_beam.end(),
               [](const BeamNode& a, const BeamNode& b) {
                   return a.getState().score > b.getState().score;
               });
 
-    // On ne conserve que _beam_size meilleurs
     if (new_beam.size() > static_cast<size_t>(_beam_size)) {
         new_beam.resize(_beam_size);
     }
 
-    // Le nouveau faisceau devient current_beam
     current_beam = std::move(new_beam);
 }
 

@@ -28,8 +28,8 @@ void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
     _scene->clear();
     this->ClearData();
 
-    const int MAX_NODES = 1000;
-    const int MAX_DEPTH = 20;
+    const int MAX_NODES = 10;
+    const int MAX_DEPTH = 100;
     int node_count = 0;
 
     for (const BeamNode &bn : nodes) {
