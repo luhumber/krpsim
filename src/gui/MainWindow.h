@@ -5,9 +5,10 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include "QThread"
 
 #include "TreeGraphicsView.h"
-#include "BeamSearch.h"
+#include "BeamSearchWorker.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

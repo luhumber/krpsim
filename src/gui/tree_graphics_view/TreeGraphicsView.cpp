@@ -28,15 +28,14 @@ void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
     _scene->clear();
     this->ClearData();
 
-    const int MAX_NODES = 10;
-    const int MAX_DEPTH = 100;
+    const int MAX_NODES = 1000;
+    const int MAX_DEPTH = 1000;
     int node_count = 0;
 
     for (const BeamNode &bn : nodes) {
         if (node_count >= MAX_NODES) break;
         int id = bn.getId();
         int parentId = bn.getParentId();
-        // On ne garde que les nœuds jusqu'à une certaine profondeur
         int depth = 0;
         int cur = id;
         while (_layouts.contains(cur) && _layouts[cur].node.getParentId() >= 0) {

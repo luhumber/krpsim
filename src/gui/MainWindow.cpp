@@ -9,10 +9,13 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->filesPushButton, &QPushButton::clicked, this, &MainWindow::on_FilesPushButtonClicked);
-    connect(ui->startPushButton, &QPushButton::clicked, this, &MainWindow::on_StartPushButtonClicked);
+    connect(ui->filesPushButton, &QPushButton::clicked,
+        this, &MainWindow::on_FilesPushButtonClicked);
+    connect(ui->startPushButton, &QPushButton::clicked,
+        this, &MainWindow::on_StartPushButtonClicked);
 
-    connect(this, &MainWindow::signal_NodesVectorCreated, ui->treeGraphicsView, &TreeGraphicsView::on_NodesVectorCreated);
+    connect(this, &MainWindow::signal_NodesVectorCreated,
+        ui->treeGraphicsView, &TreeGraphicsView::on_NodesVectorCreated);
 }
 
 MainWindow::~MainWindow() {
@@ -52,18 +55,28 @@ void MainWindow::on_StartPushButtonClicked() {
         QMessageBox::warning(this, tr("File not found"), tr("The selected file does not exist."));
         return;
     }
+    ui->startPushButton->setEnabled(false);
+
     try {
         Scenario scenario = Parser::ParseFile(std::filesystem::path(filePath.toStdString()));
-        qDebug() << "Parsed scenario with resources:" << scenario.resources;
-        // for (const Process &process : scenario.processes) {
-        //     qDebug() << "Process:" << process.name
-        //              << "| Needs:" << process.needs.toString()
-        //              << "| Results:" << process.results.toString()
-        //              << "| Delay:" << process.delay;
-        // }
-        BeamSearch beam_search(scenario, 10);
-        beam_search.RunAlgorithm();
-        emit signal_NodesVectorCreated(beam_search.getNodesVector(), beam_search.getSolutionPath());
+        int beam_size = 10;
+
+        QThread* thread = new QThread;
+        BeamSearchWorker* worker = new BeamSearchWorker(scenario, beam_size);
+        worker->moveToThread(thread);
+
+        connect(thread, &QThread::started, worker, &BeamSearchWorker::process);
+        connect(worker, &BeamSearchWorker::finished,
+            this, [=](QVector<BeamNode> nodes, QVector<BeamNode> solution) {
+                emit signal_NodesVectorCreated(nodes, solution);
+                thread->quit();
+        });
+        connect(worker, &BeamSearchWorker::finished, worker, &QObject::deleteLater);
+        connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+        connect(worker, &BeamSearchWorker::scoreUpdated,
+            ui->lineChartWidget, &LineChartWidget::appendScore);
+
+        thread->start();
     } catch (const std::exception &e) {
         QMessageBox::critical(this, tr("Parsing error"), e.what());
     }

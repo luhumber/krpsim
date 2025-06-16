@@ -5,6 +5,7 @@
 #include <QString>
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QObject>
 
 #include "Scenario.h"
 #include "BeamNode.h"
@@ -16,6 +17,8 @@ public:
     void RunAlgorithm();
     QVector<BeamNode> getSolutionPath() const;
     QVector<BeamNode> getNodesVector() const { return _nodes_vector; }
+    void setScoreCallback(std::function<void(double)> cb) { _scoreCallback = std::move(cb); }
+    const QVector<double>& getMaxScorePerIteration() const { return _maxScorePerIteration; }
 
 private:
     double ComputeScore(const BeamState& state, const Scenario& scenario) const;
@@ -23,11 +26,13 @@ private:
     const BeamNode* getBestNode() const;
     int getSumTargets(const BeamState& state) const;
 
-    const Scenario& _scenario;
-    int _beam_size;
-    QVector<BeamNode> _current_beam;
-    QVector<BeamNode> _nodes_vector;
-    double _time_penalty = 1;
-    double _max_time;
+    const Scenario&     _scenario;
+    int                 _beam_size;
+    QVector<BeamNode>   _current_beam;
+    QVector<BeamNode>   _nodes_vector;
+    double              _time_penalty = 1;
+    double              _max_time;
     QHash<QString, int> _seenStockBestTime;
+    std::function<void(double)> _scoreCallback;
+    QVector<double> _maxScorePerIteration;
 };
