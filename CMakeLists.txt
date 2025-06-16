@@ -18,11 +18,11 @@ add_executable(${PROJECT_NAME}
     src/gui/MainWindow.ui
     src/gui/tree_graphics_view/TreeGraphicsView.cpp
     src/gui/line_chart_widget/LineChartWidget.cpp
-    src/gui/bar_chart_widget/BarChartWidget.cpp
     src/gui/beam_table_view/BeamTableView.cpp
     src/core/parser/Parser.cpp
     src/core/parser/regex/RegexDefs.cpp
     src/core/beam_search/BeamSearch.cpp
+    src/core/beam_search/beam_search_worker/BeamSearchWorker.cpp
     src/core/beam_search/beam_node/BeamNode.cpp
     src/core/simulator/Stock.cpp
 )
@@ -32,13 +32,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src/gui
     src/gui/tree_graphics_view
     src/gui/line_chart_widget
-    src/gui/bar_chart_widget
     src/gui/beam_table_view
     src/core
     src/core/parser
     src/core/parser/regex
     src/core/simulator
     src/core/beam_search
+    src/core/beam_search/beam_search_worker
     src/core/beam_search/beam_node
 )
 

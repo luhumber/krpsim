@@ -123,16 +123,6 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Tree</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="TreeGraphicsView" name="treeGraphicsView"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
         <string>Progress</string>
@@ -143,16 +133,6 @@
           <item>
            <widget class="LineChartWidget" name="lineChartWidget" native="true"/>
           </item>
-          <item>
-           <widget class="BarChartWidget" name="barChartWidget" native="true">
-            <property name="maximumSize">
-             <size>
-              <width>500</width>
-              <height>16777215</height>
-             </size>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
         <item>
@@ -161,6 +141,16 @@
            <number>24</number>
           </property>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Tree</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="TreeGraphicsView" name="treeGraphicsView"/>
         </item>
        </layout>
       </widget>
@@ -200,12 +190,6 @@
    <class>LineChartWidget</class>
    <extends>QWidget</extends>
    <header>LineChartWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>BarChartWidget</class>
-   <extends>QWidget</extends>
-   <header>BarChartWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
