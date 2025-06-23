@@ -62,7 +62,8 @@ void MainWindow::on_StartPushButtonClicked() {
         int beam_size = 10;
 
         QThread* thread = new QThread;
-        BeamSearchWorker* worker = new BeamSearchWorker(scenario, beam_size);
+        BeamSearchWorker* worker = new BeamSearchWorker(scenario,
+            beam_size, ui->delaySpinBox->value());
         worker->moveToThread(thread);
 
         connect(thread, &QThread::started, worker, &BeamSearchWorker::process);

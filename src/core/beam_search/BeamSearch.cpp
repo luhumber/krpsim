@@ -4,7 +4,7 @@
 #include <QElapsedTimer>
 #include <QSet>
 
-BeamSearch::BeamSearch(const Scenario& scenario, int beam_size, double max_time)
+BeamSearch::BeamSearch(const Scenario& scenario, qint64 beam_size, qint64 max_time)
     : _scenario(scenario)
     , _beam_size(beam_size)
     , _time_penalty(1.0)
@@ -30,7 +30,14 @@ void BeamSearch::RunAlgorithm() {
 
     int next_id = 1;
 
+    QElapsedTimer timer;
+    timer.start();
+
     while (!_current_beam.isEmpty()) {
+        if (timer.elapsed() > _max_time) {
+            break;
+        }
+
         double maxScore = std::numeric_limits<double>::lowest();
         for (const BeamNode& node : _current_beam)
             if (node.score() > maxScore)
