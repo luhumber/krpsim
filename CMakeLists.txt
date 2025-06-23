@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
     src/core/beam_search/beam_search_worker/BeamSearchWorker.cpp
     src/core/beam_search/beam_node/BeamNode.cpp
     src/core/simulator/Stock.cpp
+    src/core/simulator/TraceWriter.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -43,3 +44,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets Qt6::Concurrent Qt6::Charts)
+
+add_subdirectory(krpsim_verif)

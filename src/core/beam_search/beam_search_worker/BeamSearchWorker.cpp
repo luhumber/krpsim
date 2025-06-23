@@ -1,4 +1,5 @@
 #include "BeamSearchWorker.h"
+#include "TraceWriter.h"
 
 BeamSearchWorker::BeamSearchWorker(const Scenario& scenario, int beam_size)
         : _scenario(scenario), _beam_size(beam_size) {}
@@ -9,5 +10,9 @@ void BeamSearchWorker::process() {
         emit scoreUpdated(score);
     });
     beam_search.RunAlgorithm();
+    
+    TraceWriter trace_writer;
+    trace_writer.writeTrace(beam_search.getSolutionPath());
+    
     emit finished(beam_search.getNodesVector(), beam_search.getSolutionPath());
 }
