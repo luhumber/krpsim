@@ -48,3 +48,33 @@ void MainWindow::on_filesPushButtonClicked() {
         }
     }
 }
+<<<<<<< Updated upstream
+=======
+
+void MainWindow::on_StartPushButtonClicked() {
+    const QString filePath = ui->chosenFileLineEdit->text();
+    if (!QFileInfo::exists(filePath)) {
+        QMessageBox::warning(this, tr("File not found"), tr("The selected file does not exist."));
+        return;
+    }
+    try {
+        Scenario scenario = Parser::ParseFile(std::filesystem::path(filePath.toStdString()));
+        qDebug() << "Parsed scenario with resources:" << scenario.resources;
+        // for (const Process &process : scenario.processes) {
+        //     qDebug() << "Process:" << process.name
+        //              << "| Needs:" << process.needs.toString()
+        //              << "| Results:" << process.results.toString()
+        //              << "| Delay:" << process.delay;
+        // }
+        BeamSearch beam_search(scenario, 10);
+        beam_search.RunAlgorithm();
+        if (!trace_writer) {
+            trace_writer = new TraceWriter();
+        }
+        trace_writer->writeTrace(beam_search.getSolutionPath());
+        emit signal_NodesVectorCreated(beam_search.getNodesVector(), beam_search.getSolutionPath());
+    } catch (const std::exception &e) {
+        QMessageBox::critical(this, tr("Parsing error"), e.what());
+    }
+}
+>>>>>>> Stashed changes

@@ -1,3 +1,5 @@
 build/
 .vscode/
 .DS_Store/
+/output/tracefile.txt
+krpsim.pdf

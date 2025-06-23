@@ -7,6 +7,11 @@
 #include <QMessageBox>
 
 #include "TreeGraphicsView.h"
+<<<<<<< Updated upstream
+=======
+#include "BeamSearch.h"
+#include "TraceWriter.h"
+>>>>>>> Stashed changes
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,6 +26,7 @@ public:
 
 private:
     Ui::MainWindow*         ui;
+    TraceWriter*            trace_writer = nullptr;
 
 private slots:
     void on_filesPushButtonClicked();
