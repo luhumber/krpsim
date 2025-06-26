@@ -27,6 +27,7 @@ private:
 private slots:
     void on_FilesPushButtonClicked();
     void on_StartPushButtonClicked();
+    void on_SolutionFound(const QVector<BeamNode>& nodes, const QVector<BeamNode>& solution);
 
 signals:
     void signal_NodesVectorCreated(const QVector<BeamNode>& nodes, const QVector<BeamNode> &current_beam);

@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::signal_NodesVectorCreated,
         ui->treeGraphicsView, &TreeGraphicsView::on_NodesVectorCreated);
+    connect(this, &MainWindow::signal_NodesVectorCreated,
+        this, &MainWindow::on_SolutionFound);
 }
 
 MainWindow::~MainWindow() {
@@ -81,4 +83,8 @@ void MainWindow::on_StartPushButtonClicked() {
     } catch (const std::exception &e) {
         QMessageBox::critical(this, tr("Parsing error"), e.what());
     }
+}
+
+void MainWindow::on_SolutionFound(const QVector<BeamNode>& /*nodes*/, const QVector<BeamNode>& solution) {
+    ui->beamTableView->DisplaySolutionSteps(solution);
 }
