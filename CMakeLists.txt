@@ -17,7 +17,6 @@ add_executable(${PROJECT_NAME}
     src/gui/MainWindow.cpp
     src/gui/MainWindow.ui
     src/gui/tree_graphics_view/TreeGraphicsView.cpp
-    src/gui/line_chart_widget/LineChartWidget.cpp
     src/gui/beam_table_view/BeamTableView.cpp
     src/core/parser/Parser.cpp
     src/core/parser/regex/RegexDefs.cpp
@@ -31,7 +30,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     src
     src/gui
     src/gui/tree_graphics_view
-    src/gui/line_chart_widget
     src/gui/beam_table_view
     src/core
     src/core/parser

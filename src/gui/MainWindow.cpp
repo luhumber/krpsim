@@ -76,8 +76,6 @@ void MainWindow::on_StartPushButtonClicked() {
         });
         connect(worker, &BeamSearchWorker::finished, worker, &QObject::deleteLater);
         connect(thread, &QThread::finished, thread, &QObject::deleteLater);
-        connect(worker, &BeamSearchWorker::scoreUpdated,
-            ui->lineChartWidget, &LineChartWidget::appendScore);
 
         thread->start();
     } catch (const std::exception &e) {
@@ -85,6 +83,7 @@ void MainWindow::on_StartPushButtonClicked() {
     }
 }
 
-void MainWindow::on_SolutionFound(const QVector<BeamNode>& /*nodes*/, const QVector<BeamNode>& solution) {
+void MainWindow::on_SolutionFound(const QVector<BeamNode>& nodes, const QVector<BeamNode>& solution) {
+    ui->tabWidget->setEnabled(true);
     ui->beamTableView->DisplaySolutionSteps(solution);
 }
