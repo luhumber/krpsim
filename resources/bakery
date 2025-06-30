@@ -1,0 +1,22 @@
+#
+# bakery demo - krpsim
+#
+# stock      name:quantity
+wheat:30
+water:15
+yeast:5
+box:10
+
+#
+# process   name:(need1:qty1;need2:qty2;…):(result1:qty1;…):delay
+#
+grind_wheat:(wheat:3):(flour:3):2
+mix_dough:(flour:4;water:2;yeast:1):(dough:2):5
+bake_bread:(dough:1):(bread:1):7
+package_bread:(bread:1;box:1):(packaged_bread:1):2
+
+# optimize time for no process possible (eating stock, produce all possible),
+# or maximize some products over a long delay
+# optimize:(time|stock1;time|stock2;...)
+#
+optimize:(packaged_bread)
