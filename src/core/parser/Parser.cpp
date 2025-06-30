@@ -6,28 +6,32 @@
 #include "RegexDefs.h"
 
 namespace {
-    void ParseResourceQuantities(const QString& groupString, Stock& resourceQuantities, QSet<QString>& allResources) {
-        for (const QString& item : groupString.split(';', Qt::SkipEmptyParts)) {
+    void ParseResourceQuantities(
+        const QString& group_string, Stock& resource_quantities, QSet<QString>& all_resources)
+    {
+        for (const QString& item : group_string.split(';', Qt::SkipEmptyParts)) {
             const QStringList parts = item.split(':', Qt::SkipEmptyParts);
             if (parts.size() != 2) continue;
-            const QString resourceName = parts[0].trimmed();
+            const QString resource_name = parts[0].trimmed();
             const int quantity = parts[1].toInt();
-            resourceQuantities[resourceName] = quantity;
-            allResources.insert(resourceName);
+            resource_quantities[resource_name] = quantity;
+            all_resources.insert(resource_name);
         }
     }
 
-    bool HandleStockLine(const QString& line, Scenario& scenario, QSet<QString>& resources) {
+    bool HandleStockLine(const QString& line, Scenario& scenario, QSet<QString>& resources)
+    {
         QRegularExpressionMatch match = Regex::stockLineRegex.match(line);
         if (!match.hasMatch()) return false;
-        const QString resourceName = match.captured(1);
+        const QString resource_name = match.captured(1);
         const int quantity = match.captured(2).toInt();
-        resources.insert(resourceName);
-        scenario.initial_stock[resourceName] = quantity;
+        resources.insert(resource_name);
+        scenario.initial_stock[resource_name] = quantity;
         return true;
     }
 
-    bool HandleProcessLine(const QString& line, Scenario& scenario, QSet<QString>& resources) {
+    bool HandleProcessLine(const QString& line, Scenario& scenario, QSet<QString>& resources)
+    {
         QRegularExpressionMatch match = Regex::processLineRegex.match(line);
         if (!match.hasMatch()) return false;
         Process process;
@@ -40,7 +44,8 @@ namespace {
         return true;
     }
 
-    bool HandleOptimizeLine(const QString& line, Scenario& scenario) {
+    bool HandleOptimizeLine(const QString& line, Scenario& scenario)
+    {
         QRegularExpressionMatch match = Regex::optimizeLineRegex.match(line);
         if (!match.hasMatch()) return false;
         for (const QString& target : match.captured(1).split(';', Qt::SkipEmptyParts))
@@ -49,7 +54,8 @@ namespace {
     }
 }
 
-Scenario Parser::ParseFile(const std::filesystem::path& path) {
+Scenario Parser::ParseFile(const std::filesystem::path& path)
+{
     Scenario scenario;
     QSet<QString> resources;
     QFile file(QString::fromStdString(path.string()));

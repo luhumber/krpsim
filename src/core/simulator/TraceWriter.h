@@ -5,5 +5,5 @@
 
 class TraceWriter {
 public:
-    void writeTrace(const QVector<BeamNode>& solutionPath);
+    void WriteTrace(const QVector<BeamNode>& solution_path);
 };

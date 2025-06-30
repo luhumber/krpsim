@@ -28,7 +28,7 @@ void TreeGraphicsView::ClearData()
 }
 
 void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
-                                              const QVector<BeamNode> &current_beam)
+    const QVector<BeamNode> &current_beam)
 {
     _scene->clear();
     this->ClearData();
@@ -40,7 +40,7 @@ void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
     for (const BeamNode &bn : nodes) {
         if (node_count >= MAX_NODES) break;
         int id = bn.getId();
-        int parentId = bn.getParentId();
+        int parent_id = bn.getParentId();
         int depth = 0;
         int cur = id;
         while (_layouts.contains(cur) && _layouts[cur].node.getParentId() >= 0) {
@@ -49,7 +49,7 @@ void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
         }
         if (depth > MAX_DEPTH) continue;
         _layouts[id] = { bn, -1, QPointF() };
-        _children_map[parentId].append(id);
+        _children_map[parent_id].append(id);
         ++node_count;
     }
 
@@ -107,17 +107,17 @@ void TreeGraphicsView::on_NodesVectorCreated(const QVector<BeamNode> &nodes,
 
     for (auto it = _layouts.cbegin(); it != _layouts.cend(); ++it) {
         int id = it.key();
-        int parentId = it.value().node.getParentId();
-        if (parentId < 0 || !_node_items.contains(parentId))
+        int parent_id = it.value().node.getParentId();
+        if (parent_id < 0 || !_node_items.contains(parent_id))
             continue;
 
-        QGraphicsEllipseItem *parentItem = _node_items[parentId];
-        QPointF parentCenter = parentItem->rect().center() + parentItem->pos();
+        QGraphicsEllipseItem *parent_item = _node_items[parent_id];
+        QPointF parent_center = parent_item->rect().center() + parent_item->pos();
 
-        QGraphicsEllipseItem *childItem = _node_items[id];
-        QPointF childCenter = childItem->rect().center() + childItem->pos();
+        QGraphicsEllipseItem *child_item = _node_items[id];
+        QPointF childCenter = child_item->rect().center() + child_item->pos();
 
-        _scene->addLine(QLineF(parentCenter, childCenter), edge_pen)->setZValue(0);
+        _scene->addLine(QLineF(parent_center, childCenter), edge_pen)->setZValue(0);
     }
 
     fitInView(_scene->itemsBoundingRect(), Qt::KeepAspectRatio);
@@ -129,8 +129,8 @@ void TreeGraphicsView::ComputeDepths()
 
     for (auto it = _layouts.cbegin(); it != _layouts.cend(); ++it) {
         int id = it.key();
-        int parentId = it.value().node.getParentId();
-        if (parentId < 0) {
+        int parent_id = it.value().node.getParentId();
+        if (parent_id < 0) {
             _layouts[id].depth = 0;
             queue.enqueue(id);
         }
@@ -178,10 +178,10 @@ void TreeGraphicsView::PositionRec(int nodeId)
             this->PositionRec(child_id);
         }
 
-        double firstChildX = _layouts[children.first()].pos.x();
-        double lastChildX  = _layouts[children.last()].pos.x();
+        double first_child_x = _layouts[children.first()].pos.x();
+        double last_child_x  = _layouts[children.last()].pos.x();
 
-        double x = (firstChildX + lastChildX) / 2.0;
+        double x = (first_child_x + last_child_x) / 2.0;
         double y = _layouts[nodeId].depth * _vSpacing;
         _layouts[nodeId].pos = QPointF(x, y);
     }
@@ -189,9 +189,9 @@ void TreeGraphicsView::PositionRec(int nodeId)
 
 void TreeGraphicsView::wheelEvent(QWheelEvent *event)
 {
-    const double scaleFactor = 1.15;
+    const double scale_factor = 1.15;
     if (event->angleDelta().y() > 0)
-        scale(scaleFactor, scaleFactor);
+        scale(scale_factor, scale_factor);
     else
-        scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+        scale(1.0 / scale_factor, 1.0 / scale_factor);
 }

@@ -5,22 +5,20 @@
 #include <QThread>
 
 BeamSearch::BeamSearch(const Scenario& scenario, qint64 beam_size, qint64 max_time)
-    : _scenario(scenario)
-    , _beam_size(beam_size)
-    , _time_penalty(1.0)
-    , _max_time(max_time)
+    : _scenario(scenario), _beam_size(beam_size), _time_penalty(1.0), _max_time(max_time)
 {
     BeamState initial_state{scenario.initial_stock, 0, 0.0};
     initial_state.score = this->ComputeScore(initial_state, _scenario);
     _current_beam.append(BeamNode(0, -1, initial_state, "START"));
     _nodes_vector.append(_current_beam.first());
-    _seenStockBestTime.clear();
+    _seen_stock_best_time.clear();
 }
 
-void BeamSearch::RunAlgorithm() {
+void BeamSearch::RunAlgorithm()
+{
     _nodes_vector.clear();
     _current_beam.clear();
-    _seenStockBestTime.clear();
+    _seen_stock_best_time.clear();
 
     BeamState initial_state{_scenario.initial_stock, 0, 0.0};
     initial_state.score = this->ComputeScore(initial_state, _scenario);
@@ -50,24 +48,24 @@ void BeamSearch::RunAlgorithm() {
             break;
         }
 
-        double maxScore = std::numeric_limits<double>::lowest();
-        const BeamNode* bestNode = nullptr;
+        double max_score = std::numeric_limits<double>::lowest();
+        const BeamNode* best_node = nullptr;
         for (const BeamNode& node : _current_beam) {
-            if (node.score() > maxScore) {
-                maxScore = node.score();
-                bestNode = &node;
+            if (node.score() > max_score) {
+                max_score = node.score();
+                best_node = &node;
             }
         }
 
         if (iteration % 10 == 0 || iteration <= 5) {
-            if (bestNode) {
-                qDebug() << "Iteration" << iteration << "- Stock:" << bestNode->getState().stock.toString() 
-                         << "- Temps:" << bestNode->getState().time;
+            if (best_node) {
+                qDebug() << "Iteration" << iteration << "- Stock:" << best_node->getState().stock.toString() 
+                         << "- Temps:" << best_node->getState().time;
             }
         }
 
-        if (_scoreCallback)
-            _scoreCallback(maxScore);
+        if (_score_callback)
+            _score_callback(max_score);
 
         this->ExpandBeam(_current_beam, next_id);
     }
@@ -116,7 +114,8 @@ double BeamSearch::ComputeScore(const BeamState& state, const Scenario& scenario
     return 0.0;
 }
 
-void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id) {
+void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id)
+{
     QVector<BeamNode> new_beam;
 
     for (const BeamNode& node : current_beam) {
@@ -131,9 +130,9 @@ void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id) {
                 child_state.score = this->ComputeScore(child_state, _scenario);
 
                 QString stockKey = child_state.stock.toStringSorted();
-                auto it = _seenStockBestTime.find(stockKey);
-                if (it == _seenStockBestTime.end()) {
-                    _seenStockBestTime.insert(stockKey, child_state.time);
+                auto it = _seen_stock_best_time.find(stockKey);
+                if (it == _seen_stock_best_time.end()) {
+                    _seen_stock_best_time.insert(stockKey, child_state.time);
                 }
                 else if (child_state.time < it.value()) {
                     it.value() = child_state.time;
@@ -161,17 +160,19 @@ void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id) {
     current_beam = std::move(new_beam);
 }
 
-const BeamNode* BeamSearch::getBestNode() const {
+const BeamNode* BeamSearch::getBestNode() const
+{
     if (_nodes_vector.isEmpty()) return nullptr;
 
-    auto it = std::max_element(_nodes_vector.begin(), _nodes_vector.end(),
-                               [](const BeamNode& a, const BeamNode& b) {
-                                   return a.score() < b.score();
-                               });
+    auto it = std::max_element(
+        _nodes_vector.begin(), _nodes_vector.end(), [](const BeamNode& a, const BeamNode& b) 
+    {
+        return a.score() < b.score();
+    });
     return &(*it);
 }
 
-QVector<BeamNode> BeamSearch::getSolutionPath() const
+QVector<BeamNode> BeamSearch::getsolutionPath() const
 {
     QVector<BeamNode> path;
     const BeamNode* best = this->getBestNode();

@@ -33,7 +33,9 @@ private slots:
     void on_StartPushButtonClicked();
     void on_StopPushButtonClicked();
     void on_SolutionFound(const QVector<BeamNode>& nodes, const QVector<BeamNode>& solution);
+    void on_BeamSearchFinished(QVector<BeamNode> nodes, QVector<BeamNode> solution);
 
 signals:
-    void signal_NodesVectorCreated(const QVector<BeamNode>& nodes, const QVector<BeamNode> &current_beam);
+    void signal_NodesVectorCreated(const QVector<BeamNode>& nodes,
+        const QVector<BeamNode> &current_beam);
 };

@@ -5,42 +5,42 @@
 #include <QDir>
 #include "BeamNode.h"
 
-void TraceWriter::writeTrace(const QVector<BeamNode>& solutionPath) {
+void TraceWriter::WriteTrace(const QVector<BeamNode>& solution_path) {
     qDebug() << "Writing trace to file...";
-    if (solutionPath.isEmpty()) {
+    if (solution_path.isEmpty()) {
         qDebug() << "No solution path to write.";
         return;
     }
     
-    QDir currentDir = QDir::current();
+    QDir current_dir = QDir::current();
     
-    if (!currentDir.cdUp()) {
+    if (!current_dir.cdUp()) {
         qDebug() << "Failed to access parent directory";
         return;
     }
     
-    if (!currentDir.exists("output")) {
-        if (!currentDir.mkdir("output")) {
+    if (!current_dir.exists("output")) {
+        if (!current_dir.mkdir("output")) {
             qDebug() << "Failed to create output directory";
             return;
         }
     }
     
-    QString filePath = currentDir.filePath("output/tracefile.txt");
-    QFile traceFile(filePath);
+    QString file_path = current_dir.filePath("output/tracefile.txt");
+    QFile trace_file(file_path);
     
-    if (!traceFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Failed to open file for writing:" << traceFile.errorString();
+    if (!trace_file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Failed to open file for writing:" << trace_file.errorString();
         return;
     }
     
-    QTextStream out(&traceFile);
-    for (const BeamNode& node : solutionPath) {
+    QTextStream out(&trace_file);
+    for (const BeamNode& node : solution_path) {
         if (node.getProcessName() == "START")
             continue;
         out << node.getState().time << ":" << node.getProcessName() << "\n";
     }
     
-    traceFile.close();
-    qDebug() << "Trace written to" << filePath;
+    trace_file.close();
+    qDebug() << "Trace written to" << file_path;
 }

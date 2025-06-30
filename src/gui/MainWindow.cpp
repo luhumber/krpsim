@@ -22,23 +22,21 @@ MainWindow::MainWindow(QWidget *parent)
         this, &MainWindow::on_SolutionFound);
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-void MainWindow::on_FilesPushButtonClicked() {
-    QStringList fileNames = QFileDialog::getOpenFileNames(
-        this,
-        tr("Select a file"),
-        QDir::homePath(),
-        tr("All files (*)")
-    );
-    if (!fileNames.isEmpty()) {
-        for (const QString& fileName : fileNames) {
-            QFileInfo info(fileName);
+void MainWindow::on_FilesPushButtonClicked()
+{
+    QStringList file_names = QFileDialog::getOpenFileNames(
+        this, tr("Select a file"), QDir::homePath(), tr("All files (*)"));
+    if (!file_names.isEmpty()) {
+        for (const QString& file_name : file_names) {
+            QFileInfo info(file_name);
             if (info.suffix().isEmpty()) {
-                qDebug() << "Selected file:" << fileName;
-                ui->chosenFileLineEdit->setText(fileName);
+                qDebug() << "Selected file:" << file_name;
+                ui->chosenFileLineEdit->setText(file_name);
                 ui->startPushButton->setEnabled(true);
             } else {
                 QMessageBox::warning(
@@ -53,19 +51,21 @@ void MainWindow::on_FilesPushButtonClicked() {
     }
 }
 
-void MainWindow::on_StartPushButtonClicked() {
-    const QString filePath = ui->chosenFileLineEdit->text();
-    if (!QFileInfo::exists(filePath)) {
+void MainWindow::on_StartPushButtonClicked()
+{
+    const QString file_path = ui->chosenFileLineEdit->text();
+    if (!QFileInfo::exists(file_path)) {
         QMessageBox::warning(this, tr("File not found"), tr("The selected file does not exist."));
         return;
     }
+
     ui->startPushButton->setEnabled(false);
     ui->filesPushButton->setEnabled(false);
     ui->stopPushButton->setEnabled(true);
     _search_interrupted = false;
 
     try {
-        Scenario scenario = Parser::ParseFile(std::filesystem::path(filePath.toStdString()));
+        Scenario scenario = Parser::ParseFile(std::filesystem::path(file_path.toStdString()));
         int beam_size = 10;
 
         QThread* thread = new QThread;
@@ -75,17 +75,7 @@ void MainWindow::on_StartPushButtonClicked() {
         worker->moveToThread(thread);
 
         connect(thread, &QThread::started, worker, &BeamSearchWorker::process);
-        connect(worker, &BeamSearchWorker::finished,
-            this, [=](QVector<BeamNode> nodes, QVector<BeamNode> solution) {
-                if (!_search_interrupted) {
-                    emit signal_NodesVectorCreated(nodes, solution);
-                } else {
-                    ui->beamTableView->ClearTable();
-                    ui->treeGraphicsView->ClearTree();
-                }
-                _current_thread = nullptr;
-                thread->quit();
-        });
+        connect(worker, &BeamSearchWorker::finished, this, &MainWindow::on_BeamSearchFinished);
         connect(worker, &BeamSearchWorker::finished, worker, &QObject::deleteLater);
         connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
@@ -95,7 +85,22 @@ void MainWindow::on_StartPushButtonClicked() {
     }
 }
 
-void MainWindow::on_StopPushButtonClicked() {
+void MainWindow::on_BeamSearchFinished(QVector<BeamNode> nodes, QVector<BeamNode> solution)
+{
+    if (!_search_interrupted) {
+        emit signal_NodesVectorCreated(nodes, solution);
+    } else {
+        ui->beamTableView->ClearTable();
+        ui->treeGraphicsView->ClearTree();
+    }
+    _current_thread = nullptr;
+    if (_current_thread) {
+        _current_thread->quit();
+    }
+}
+
+void MainWindow::on_StopPushButtonClicked()
+{
     _search_interrupted = true;
     
     if (_current_thread && _current_thread->isRunning()) {
@@ -116,7 +121,8 @@ void MainWindow::on_StopPushButtonClicked() {
     QMessageBox::information(this, tr("Beam Search"), tr("Beam search has been stopped."));
 }
 
-void MainWindow::on_SolutionFound(const QVector<BeamNode>& nodes, const QVector<BeamNode>& solution) {
+void MainWindow::on_SolutionFound(const QVector<BeamNode>& nodes, const QVector<BeamNode>& solution)
+{
     ui->tabWidget->setEnabled(true);
     ui->filesPushButton->setEnabled(true);
     ui->stopPushButton->setEnabled(false);
