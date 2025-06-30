@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QSet>
+#include <QThread>
 
 BeamSearch::BeamSearch(const Scenario& scenario, qint64 beam_size, qint64 max_time)
     : _scenario(scenario)
@@ -35,6 +36,11 @@ void BeamSearch::RunAlgorithm() {
 
     while (!_current_beam.isEmpty()) {
         if (timer.elapsed() > _max_time) {
+            break;
+        }
+        
+        if (QThread::currentThread()->isInterruptionRequested()) {
+            qDebug() << "Beam search interrupted.";
             break;
         }
 
@@ -104,10 +110,6 @@ void BeamSearch::ExpandBeam(QVector<BeamNode>& current_beam, int& next_id) {
                 BeamState child_state = state;
                 child_state.stock.ApplyProcess(process.needs, process.results);
                 child_state.time += process.delay;
-
-                if (child_state.time > _max_time) {
-                    continue;
-                }
 
                 child_state.score = this->ComputeScore(child_state, _scenario);
 

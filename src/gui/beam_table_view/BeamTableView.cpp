@@ -4,7 +4,9 @@
 #include <QHeaderView>
 #include "BeamNode.h"
 
-BeamTableView::BeamTableView(QWidget *parent) : QTableView(parent) { }
+BeamTableView::BeamTableView(QWidget *parent) : QTableView(parent) {
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
 
 void BeamTableView::DisplaySolutionSteps(const QVector<BeamNode>& solution)
 {
@@ -19,5 +21,5 @@ void BeamTableView::DisplaySolutionSteps(const QVector<BeamNode>& solution)
         model->setItem(row, 3, new QStandardItem(QString::number(node.score(), 'f', 2)));
     }
     setModel(model);
-    horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 }
