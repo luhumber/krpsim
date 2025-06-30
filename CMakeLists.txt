@@ -10,6 +10,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
+set(CMAKE_PREFIX_PATH "/home/luhumber/goinfre/Qt/6.9.1/gcc_64" CACHE PATH "Qt installation prefix")
+
 find_package(Qt6 REQUIRED COMPONENTS Widgets Concurrent Charts)
 
 add_executable(${PROJECT_NAME}

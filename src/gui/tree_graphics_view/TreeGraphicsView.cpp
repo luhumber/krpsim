@@ -1,4 +1,3 @@
-// TreeGraphicsView.cpp
 #include "TreeGraphicsView.h"
 #include <QWheelEvent>
 #include <QGraphicsEllipseItem>
