@@ -12,6 +12,7 @@ class TreeGraphicsView : public QGraphicsView
 
 public:
     explicit TreeGraphicsView(QWidget *parent = nullptr);
+    void     ClearTree();
 
 public slots:
     void on_NodesVectorCreated(const QVector<BeamNode> &nodes, 

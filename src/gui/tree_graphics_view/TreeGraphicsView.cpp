@@ -14,6 +14,12 @@ TreeGraphicsView::TreeGraphicsView(QWidget *parent)
     setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
+void TreeGraphicsView::ClearTree()
+{
+    _scene->clear();
+    this->ClearData();
+}
+
 void TreeGraphicsView::ClearData()
 {
     _layouts.clear();

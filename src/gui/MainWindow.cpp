@@ -79,6 +79,9 @@ void MainWindow::on_StartPushButtonClicked() {
             this, [=](QVector<BeamNode> nodes, QVector<BeamNode> solution) {
                 if (!_search_interrupted) {
                     emit signal_NodesVectorCreated(nodes, solution);
+                } else {
+                    ui->beamTableView->ClearTable();
+                    ui->treeGraphicsView->ClearTree();
                 }
                 _current_thread = nullptr;
                 thread->quit();

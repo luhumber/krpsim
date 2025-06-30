@@ -1,7 +1,6 @@
 #include "BeamSearch.h"
 #include <algorithm>
 #include <QDebug>
-#include <QElapsedTimer>
 #include <QSet>
 #include <QThread>
 
@@ -30,12 +29,19 @@ void BeamSearch::RunAlgorithm() {
     _current_beam.append(root_node);
 
     int next_id = 1;
-
-    QElapsedTimer timer;
-    timer.start();
+    int iteration = 0;
 
     while (!_current_beam.isEmpty()) {
-        if (timer.elapsed() > _max_time) {
+        iteration++;
+        
+        qint64 max_beam_time = 0;
+        for (const BeamNode& node : _current_beam) {
+            if (node.getState().time > max_beam_time) {
+                max_beam_time = node.getState().time;
+            }
+        }
+        
+        if (max_beam_time > _max_time) {
             break;
         }
         
@@ -45,9 +51,20 @@ void BeamSearch::RunAlgorithm() {
         }
 
         double maxScore = std::numeric_limits<double>::lowest();
-        for (const BeamNode& node : _current_beam)
-            if (node.score() > maxScore)
+        const BeamNode* bestNode = nullptr;
+        for (const BeamNode& node : _current_beam) {
+            if (node.score() > maxScore) {
                 maxScore = node.score();
+                bestNode = &node;
+            }
+        }
+
+        if (iteration % 10 == 0 || iteration <= 5) {
+            if (bestNode) {
+                qDebug() << "Iteration" << iteration << "- Stock:" << bestNode->getState().stock.toString() 
+                         << "- Temps:" << bestNode->getState().time;
+            }
+        }
 
         if (_scoreCallback)
             _scoreCallback(maxScore);

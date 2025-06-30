@@ -9,4 +9,5 @@ class BeamTableView : public QTableView
 public:
     explicit BeamTableView(QWidget *parent = nullptr);
     void DisplaySolutionSteps(const QVector<BeamNode>& solution);
+    void ClearTable();
 };

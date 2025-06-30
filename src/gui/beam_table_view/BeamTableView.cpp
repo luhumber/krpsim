@@ -21,5 +21,14 @@ void BeamTableView::DisplaySolutionSteps(const QVector<BeamNode>& solution)
         model->setItem(row, 3, new QStandardItem(QString::number(node.score(), 'f', 2)));
     }
     setModel(model);
-    horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void BeamTableView::ClearTable()
+{
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(this->model());
+    if (model) {
+        model->clear();
+        setModel(nullptr);
+    }
 }
