@@ -1,11 +1,11 @@
 #include "BeamSearchWorker.h"
 #include "TraceWriter.h"
 
-BeamSearchWorker::BeamSearchWorker(const Scenario& scenario, int beam_size)
-        : _scenario(scenario), _beam_size(beam_size) {}
+BeamSearchWorker::BeamSearchWorker(const Scenario& scenario, qint64 beam_size, qint64 max_time)
+        : _scenario(scenario), _beam_size(beam_size), _max_time(max_time) {}
 
 void BeamSearchWorker::process() {
-    BeamSearch beam_search(_scenario, _beam_size);
+    BeamSearch beam_search(_scenario, _beam_size, _max_time * 1000);
     beam_search.setScoreCallback([this](double score) {
         emit scoreUpdated(score);
     });

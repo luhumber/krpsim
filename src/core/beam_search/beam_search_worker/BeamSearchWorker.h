@@ -7,7 +7,7 @@
 class BeamSearchWorker : public QObject {
     Q_OBJECT
 public:
-    BeamSearchWorker(const Scenario& scenario, int beam_size);
+    BeamSearchWorker(const Scenario& scenario, qint64 beam_size, qint64 max_time = 200000);
 
 public slots:
     void process();
@@ -18,5 +18,6 @@ signals:
 
 private:
     Scenario _scenario;
-    int _beam_size;
+    qint64 _beam_size;
+    qint64 _max_time;
 };

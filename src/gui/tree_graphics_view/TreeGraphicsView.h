@@ -1,4 +1,3 @@
-// TreeGraphicsView.h
 #pragma once
 
 #include <QGraphicsView>

@@ -67,7 +67,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="delaySpinBox"/>
+            <widget class="QSpinBox" name="delaySpinBox">
+             <property name="maximum">
+              <number>40000</number>
+             </property>
+             <property name="value">
+              <number>10</number>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer_2">
@@ -85,14 +92,31 @@
           </layout>
          </item>
          <item>
-          <widget class="QPushButton" name="startPushButton">
-           <property name="enabled">
-            <bool>false</bool>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="topMargin">
+            <number>0</number>
            </property>
-           <property name="text">
-            <string>Start</string>
-           </property>
-          </widget>
+           <item>
+            <widget class="QPushButton" name="startPushButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Start</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stopPushButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Stop</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -114,6 +138,9 @@
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="tabPosition">
        <enum>QTabWidget::TabPosition::North</enum>
       </property>
@@ -123,27 +150,6 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Progress</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="LineChartWidget" name="lineChartWidget" native="true"/>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QProgressBar" name="progressBar">
-          <property name="value">
-           <number>24</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
         <string>Tree</string>
@@ -185,12 +191,6 @@
    <class>TreeGraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>TreeGraphicsView.h</header>
-  </customwidget>
-  <customwidget>
-   <class>LineChartWidget</class>
-   <extends>QWidget</extends>
-   <header>LineChartWidget.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>BeamTableView</class>
